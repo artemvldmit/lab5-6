@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "Waiting for backend..."
           for i in $(seq 1 30); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/login \
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:5001/auth/login \
               -H "Content-Type: application/json" \
               -d '{"email":"x","password":"x"}')
             if [ "$STATUS" = "401" ] || [ "$STATUS" = "200" ]; then
@@ -47,12 +47,12 @@ jobs:
 
       - name: Check frontend responds
         run: |
-          curl -sf http://localhost:8080 -o /dev/null
+          curl -sf http://127.0.0.1:8080 -o /dev/null
           echo "Frontend OK"
 
       - name: Check backend register endpoint
         run: |
-          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/register \
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:5001/auth/register \
             -H "Content-Type: application/json" \
             -d '{"username":"testuser","email":"test@example.com","password":"Test1234!"}')
           echo "Register status: $HTTP"
@@ -60,7 +60,7 @@ jobs:
 
       - name: Check backend login endpoint
         run: |
-          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/login \
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:5001/auth/login \
             -H "Content-Type: application/json" \
             -d '{"email":"test@example.com","password":"Test1234!"}')
           echo "Login status: $HTTP"
@@ -68,13 +68,13 @@ jobs:
 
       - name: Check tasks endpoint returns 401 without token
         run: |
-          HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/tasks)
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5001/tasks)
           echo "Tasks status: $HTTP"
           test "$HTTP" = "401"
 
       - name: Check categories endpoint returns 401 without token
         run: |
-          HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/categories)
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5001/categories)
           echo "Categories status: $HTTP"
           test "$HTTP" = "401"
 
