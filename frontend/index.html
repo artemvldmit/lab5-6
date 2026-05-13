@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0f1117;
+      --sidebar-bg: #090c12;
+      --border: #1e2433;
+      --text: #e2e8f0;
+      --text-muted: #5a6780;
+      --accent: #6366f1;
+      --accent-hover: #4f52d3;
+      --red: #f87171;
+      --green: #34d399;
+      --orange: #fb923c;
+      --purple: #a78bfa;
+      --tag-bg: #1a1f2e;
+      --hover: #141826;
+      --sidebar-w: 240px;
+    }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 18px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workspace-name {
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .workspace-name span {
+      font-size: 20px;
+      -webkit-text-fill-color: initial;
+    }
+
+    .user-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .sidebar-nav {
+      padding: 8px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.15s, color 0.15s;
+      font-size: 13.5px;
+    }
+
+    .nav-item:hover {
+      background: var(--hover);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .nav-icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-section {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 14px 10px 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.5;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 8px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(248, 113, 113, 0.08);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    .page {
+      display: none;
+      padding: 44px 80px;
+      max-width: 920px;
+      width: 100%;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-title {
+      font-size: 30px;
+      font-weight: 700;
+      margin-bottom: 28px;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── AUTH ── */
+    .auth-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 60% 40%, rgba(99, 102, 241, 0.08) 0%, transparent 65%),
+        radial-gradient(ellipse at 20% 80%, rgba(167, 139, 250, 0.05) 0%, transparent 60%),
+        var(--bg);
+    }
+
+    .auth-card {
+      background: #0c1018;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 400px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.06);
+    }
+
+    .auth-logo {
+      font-size: 26px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .auth-sub {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      font-size: 13px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      font-size: 13.5px;
+      transition: color 0.15s;
+    }
+
+    .auth-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .auth-form.active {
+      display: flex;
+    }
+
+    /* ── INPUTS ── */
+    .field-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.03em;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input,
+    textarea,
+    select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #0a0d14;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    select option {
+      background: #0a0d14;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: rgba(248, 113, 113, 0.18);
+    }
+
+    .btn-success {
+      background: rgba(52, 211, 153, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, 0.2);
+    }
+
+    .btn-success:hover {
+      background: rgba(52, 211, 153, 0.18);
+    }
+
+    .btn-warning {
+      background: rgba(251, 146, 60, 0.1);
+      color: var(--orange);
+      border: 1px solid rgba(251, 146, 60, 0.2);
+    }
+
+    .btn-warning:hover {
+      background: rgba(251, 146, 60, 0.18);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--hover);
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toolbar-left {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── TASKS ── */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .task-card {
+      background: #111520;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .task-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .task-check {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .task-check:hover {
+      border-color: var(--green);
+    }
+
+    .task-check.done {
+      background: var(--green);
+      border-color: var(--green);
+      color: #0a0d14;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .task-body {
+      flex: 1;
+    }
+
+    .task-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .task-title.done {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .tag {
+      font-size: 11.5px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    .tag.priority-high {
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--red);
+      border-color: rgba(248, 113, 113, 0.2);
+    }
+
+    .tag.priority-medium {
+      background: rgba(251, 146, 60, 0.1);
+      color: var(--orange);
+      border-color: rgba(251, 146, 60, 0.2);
+    }
+
+    .tag.priority-low {
+      background: rgba(52, 211, 153, 0.1);
+      color: var(--green);
+      border-color: rgba(52, 211, 153, 0.2);
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .task-card:hover .task-actions {
+      opacity: 1;
+    }
+
+    /* ── NOTES ── */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .note-card {
+      background: #111520;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+
+    .note-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .note-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .note-preview {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      line-clamp: 3;
+      line-height: 1.6;
+    }
+
+    .note-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 12px;
+      opacity: 0.6;
+    }
+
+    .note-del {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .note-card:hover .note-del {
+      opacity: 1;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #0c1018;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      width: 520px;
+      max-width: 95vw;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .modal-close:hover {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 22px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ── CATEGORIES SIDEBAR ── */
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .cat-item:hover {
+      background: var(--hover);
+      color: var(--text);
+    }
+
+    .cat-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── EMAIL ── */
+    .mail-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      background: #111520;
+      transition: border-color 0.15s;
+    }
+
+    .mail-item:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .mail-subject {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .mail-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      z-index: 999;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+    }
+
+    .toast.ok {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+    }
+
+    .toast.err {
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+    }
+
+    .toast.show {
+      display: block;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-size: 15px;
+    }
+
+    /* ── NOTE EDITOR ── */
+    .note-editor {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .note-editor.open {
+      display: flex;
+    }
+
+    #note-editor-title {
+      font-size: 28px;
+      font-weight: 700;
+      border: none;
+      outline: none;
+      padding: 0;
+      margin-bottom: 16px;
+      background: transparent;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    #note-editor-content {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-muted);
+      min-height: 400px;
+      background: transparent;
+    }
+
+    .filter-select {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 13px;
+      background: #0a0d14;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #111520;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.15s;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── EMAIL TABS ── */
+    .email-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .email-tab {
+      padding: 10px 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      font-size: 13.5px;
+      transition: color 0.15s;
+    }
+
+    .email-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .email-tab-content {
+      display: block;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- AUTH -->
+  <div class="auth-wrap" id="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">📓 Project</div>
+      <div class="auth-sub">Твой личный рабочий стол</div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login')">Войти</div>
+        <div class="auth-tab" onclick="switchAuthTab('register')">Регистрация</div>
+      </div>
+      <!-- Login -->
+      <div class="auth-form active" id="form-login">
+        <div class="field-group">
+          <div class="field-label">Email</div><input id="l-email" type="email" placeholder="you@gmail.com" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Пароль</div><input id="l-pass" type="password" placeholder="••••••••" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">Войти</button>
+      </div>
+      <!-- Register -->
+      <div class="auth-form" id="form-register">
+        <div class="field-group">
+          <div class="field-label">Имя</div><input id="r-name" placeholder="Твоё имя" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Email</div><input id="r-email" type="email" placeholder="you@gmail.com" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Пароль</div><input id="r-pass" type="password" placeholder="••••••••" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doRegister()">Создать аккаунт</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" style="display:none; width:100%; flex-direction:row;">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="workspace-name"><span>📓</span> Project</div>
+        <div class="user-info" id="sidebar-user">—</div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section">Главное</div>
+        <div class="nav-item active" onclick="showPage('dashboard', this)"><span class="nav-icon">🏠</span> Дашборд
+        </div>
+        <div class="nav-item" onclick="showPage('tasks', this)"><span class="nav-icon">✅</span> Задачи</div>
+        <div class="nav-item" onclick="showPage('notes', this)"><span class="nav-icon">📝</span> Заметки</div>
+        <div class="nav-section">Почта</div>
+        <div class="nav-item" onclick="showPage('email', this)"><span class="nav-icon">✉️</span> Почта</div>
+        <div class="nav-section">Категории</div>
+        <div id="cat-list-sidebar"></div>
+        <div class="nav-item" onclick="openModal('modal-cat')"><span class="nav-icon">➕</span> Добавить</div>
+      </div>
+      <div style="padding: 8px 16px; font-size: 12px;"><span id="ws-status">⚪ Connecting...</span></div>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="doLogout()">Выйти</button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+      <!-- Dashboard -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title" id="greeting">Добрый день 👋</div>
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">Всего задач</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-done">0</div>
+            <div class="stat-label">Выполнено</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-today">0</div>
+            <div class="stat-label">Дедлайн сегодня</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-notes">0</div>
+            <div class="stat-label">Заметок</div>
+          </div>
+        </div>
+        <h3 style="margin-bottom:12px; font-size:16px;">Последние задачи</h3>
+        <div id="dash-tasks" class="task-list"></div>
+      </div>
+
+      <!-- Tasks -->
+      <div class="page" id="page-tasks">
+        <div class="page-title">Задачи</div>
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <select class="filter-select" id="filter-priority" onchange="loadTasks()">
+              <option value="">Все приоритеты</option>
+              <option value="high">🔴 Высокий</option>
+              <option value="medium">🟡 Средний</option>
+              <option value="low">🟢 Низкий</option>
+            </select>
+            <select class="filter-select" id="filter-cat" onchange="loadTasks()">
+              <option value="">Все категории</option>
+            </select>
+            <select class="filter-select" id="filter-done" onchange="loadTasks()">
+              <option value="">Все статусы</option>
+              <option value="false">В процессе</option>
+              <option value="true">Выполнено</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="openTaskModal()">+ Новая задача</button>
+        </div>
+        <div class="task-list" id="task-list"></div>
+      </div>
+
+      <!-- Notes -->
+      <div class="page" id="page-notes">
+        <div id="notes-list-view">
+          <div class="toolbar">
+            <div class="page-title" style="margin:0">Заметки</div>
+            <button class="btn btn-primary" onclick="newNote()">+ Новая заметка</button>
+          </div>
+          <div class="notes-grid" id="notes-grid" style="margin-top:20px"></div>
+        </div>
+        <div class="note-editor" id="note-editor">
+          <div style="display:flex; gap:8px; margin-bottom:20px;">
+            <button class="btn btn-ghost" onclick="closeNoteEditor()">← Назад</button>
+            <button class="btn btn-primary" onclick="saveNote()">Сохранить</button>
+          </div>
+          <input id="note-editor-title" placeholder="Заголовок заметки…" />
+          <textarea id="note-editor-content" placeholder="Начни писать…"></textarea>
+        </div>
+      </div>
+
+      <!-- Email unified -->
+      <div class="page" id="page-email">
+        <div class="page-title">Почта</div>
+        <div class="email-tabs">
+          <div class="email-tab active" onclick="switchEmailTab('send', this)">📤 Новое письмо</div>
+          <div class="email-tab" onclick="switchEmailTab('inbox', this)">📥 Входящие</div>
+        </div>
+
+        <!-- Send tab -->
+        <div id="email-tab-send" class="email-tab-content active">
+          <div style="max-width:540px; display:flex; flex-direction:column; gap:14px; margin-top:20px;">
+            <div class="field-group">
+              <div class="field-label">Кому</div><input id="e-to" placeholder="email@example.com" />
+            </div>
+            <div class="field-group">
+              <div class="field-label">Тема</div><input id="e-sub" placeholder="Тема письма" />
+            </div>
+            <div class="field-group">
+              <div class="field-label">Текст</div><textarea id="e-body" rows="6" placeholder="Текст письма…"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:fit-content" onclick="sendEmail()">📨 Отправить</button>
+          </div>
+        </div>
+
+        <!-- Inbox tab -->
+        <div id="email-tab-inbox" class="email-tab-content" style="display:none;">
+          <div style="display:flex; gap:10px; margin:20px 0 16px;">
+            <button class="btn btn-ghost" onclick="loadInbox('imap')">🔄 Загрузить IMAP</button>
+            <button class="btn btn-ghost" onclick="loadInbox('pop3')">🔄 Загрузить POP3</button>
+          </div>
+          <div id="inbox-list">
+            <p style="color:var(--text-muted)">Нажмите кнопку для загрузки писем</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Task -->
+  <div class="modal-overlay" id="modal-task">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="task-modal-title">Новая задача</div>
+        <button class="modal-close" onclick="closeModal('modal-task')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <div class="field-label">Название *</div><input id="t-title" placeholder="Название задачи" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Описание</div><textarea id="t-desc" rows="3" placeholder="Описание…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <div class="field-label">Приоритет</div>
+            <select id="t-priority">
+              <option value="high">🔴 Высокий</option>
+              <option value="medium" selected>🟡 Средний</option>
+              <option value="low">🟢 Низкий</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Категория</div>
+            <select id="t-cat">
+              <option value="">Без категории</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Дедлайн</div><input type="date" id="t-deadline" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-task')">Отмена</button>
+        <button class="btn btn-primary" onclick="saveTask()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Category -->
+  <div class="modal-overlay" id="modal-cat">
+    <div class="modal" style="width:360px">
+      <div class="modal-header">
+        <div class="modal-title">Новая категория</div>
+        <button class="modal-close" onclick="closeModal('modal-cat')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <div class="field-label">Название</div><input id="c-name" placeholder="Работа, Учёба…" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Цвет</div><input type="color" id="c-color" value="#6366f1"
+            style="height:38px; cursor:pointer;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-cat')">Отмена</button>
+        <button class="btn btn-primary" onclick="saveCategory()">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Send Task -->
+  <div class="modal-overlay" id="modal-send-task">
+    <div class="modal" style="width:420px">
+      <div class="modal-header">
+        <div class="modal-title">Отправить задачу на email</div>
+        <button class="modal-close" onclick="closeModal('modal-send-task')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <div class="field-label">Кому</div><input id="st-to" placeholder="email@example.com" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-send-task')">Отмена</button>
+        <button class="btn btn-primary" onclick="sendTaskEmail()">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Socket.IO client library from CDN -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+  <script>
+    const API = "http://localhost:5001";
+    let token = localStorage.getItem("token") || "";
+    let username = localStorage.getItem("username") || "";
+    let editTaskId = null;
+    let editNoteId = null;
+    let sendTaskData = null;
+    let allTasks = [];
+    let categories = [];
+
+    // ── UTILS ──────────────────────────────────────────────────────────
+    function h(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+    function toast(msg, ok = true) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = `toast ${ok ? "ok" : "err"} show`;
+      setTimeout(() => el.classList.remove("show"), 3000);
+    }
+
+    function headers() {
+      return { "Content-Type": "application/json", "Authorization": `Bearer ${token}` };
+    }
+
+    async function api(method, path, body) {
+      const opts = { method, headers: headers() };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(API + path, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error");
+      return data;
+    }
+
+    // ── AUTH ──────────────────────────────────────────────────────────
+    function switchAuthTab(tab) {
+      document.querySelectorAll(".auth-tab").forEach((t, i) => t.classList.toggle("active", (tab === "login" && i === 0) || (tab === "register" && i === 1)));
+      document.getElementById("form-login").classList.toggle("active", tab === "login");
+      document.getElementById("form-register").classList.toggle("active", tab === "register");
+    }
+
+    async function doLogin() {
+      try {
+        const d = await api("POST", "/auth/login", { email: document.getElementById("l-email").value, password: document.getElementById("l-pass").value });
+        setAuth(d.token, d.username);
+      } catch (e) { toast(e.message, false); }
+    }
+
+    async function doRegister() {
+      try {
+        const d = await api("POST", "/auth/register", { username: document.getElementById("r-name").value, email: document.getElementById("r-email").value, password: document.getElementById("r-pass").value });
+        setAuth(d.token, d.username);
+      } catch (e) { toast(e.message, false); }
+    }
+
+    function setAuth(t, u) {
+      token = t; username = u;
+      localStorage.setItem("token", t);
+      localStorage.setItem("username", u);
+      document.getElementById("auth-wrap").style.display = "none";
+      const app = document.getElementById("app");
+      app.style.display = "flex";
+      document.getElementById("sidebar-user").textContent = u;
+      const h = new Date().getHours();
+      document.getElementById("greeting").textContent =
+        (h < 12 ? "Доброе утро" : h < 18 ? "Добрый день" : "Добрый вечер") + ` ${u} 👋`;
+      loadAll();
+      setTimeout(connectWebSocket, 500);
+    }
+
+    function doLogout() {
+      token = ""; username = "";
+      localStorage.removeItem("token"); localStorage.removeItem("username");
+      document.getElementById("app").style.display = "none";
+      document.getElementById("auth-wrap").style.display = "flex";
+    }
+
+    // ── PAGES ─────────────────────────────────────────────────────────
+    function showPage(name, el) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+      document.getElementById("page-" + name).classList.add("active");
+      if (el) el.classList.add("active");
+      if (name === "tasks") loadTasks();
+      if (name === "notes") loadNotes();
+      if (name === "dashboard") loadDashboard();
+      if (name === "email") switchEmailTab('send', document.querySelector('.email-tab'));
+    }
+
+    // ── LOAD ALL ──────────────────────────────────────────────────────
+    async function loadAll() {
+      await loadCategories();
+      await loadDashboard();
+    }
+
+    // ── DASHBOARD ─────────────────────────────────────────────────────
+    async function loadDashboard() {
+      try {
+        const [tasks, notes] = await Promise.all([api("GET", "/tasks"), api("GET", "/notes")]);
+        allTasks = tasks;
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("stat-total").textContent = tasks.length;
+        document.getElementById("stat-done").textContent = tasks.filter(t => t.done).length;
+        document.getElementById("stat-today").textContent = tasks.filter(t => t.deadline === today && !t.done).length;
+        document.getElementById("stat-notes").textContent = notes.length;
+        const recent = tasks.slice(0, 5);
+        document.getElementById("dash-tasks").innerHTML = recent.length
+          ? recent.map(t => taskCardHTML(t)).join("")
+          : `<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">Нет задач</div></div>`;
+      } catch (e) { }
+    }
+
+    // ── CATEGORIES ────────────────────────────────────────────────────
+    async function loadCategories() {
+      try {
+        categories = await api("GET", "/categories");
+        renderCatSidebar();
+        renderCatSelects();
+      } catch (e) { }
+    }
+
+    function renderCatSidebar() {
+      const el = document.getElementById("cat-list-sidebar");
+      el.innerHTML = categories.map(c => `
+    <div class="cat-item" onclick="filterByCategory(${c.id})">
+      <div class="cat-dot" style="background:${h(c.color)}"></div>
+      ${h(c.name)}
+    </div>`).join("");
+    }
+
+    function renderCatSelects() {
+      const opts = categories.map(c => `<option value="${c.id}">${h(c.name)}</option>`).join("");
+      document.getElementById("t-cat").innerHTML = `<option value="">Без категории</option>` + opts;
+      document.getElementById("filter-cat").innerHTML = `<option value="">Все категории</option>` + opts;
+    }
+
+    async function saveCategory() {
+      const name = document.getElementById("c-name").value.trim();
+      const color = document.getElementById("c-color").value;
+      if (!name) { toast("Введи название", false); return; }
+      try {
+        await api("POST", "/categories", { name, color });
+        closeModal("modal-cat");
+        document.getElementById("c-name").value = "";
+        toast("Категория создана");
+        await loadCategories();
+      } catch (e) { toast(e.message, false); }
+    }
+
+    function filterByCategory(id) {
+      document.getElementById("filter-cat").value = id;
+      showPage("tasks", document.querySelectorAll(".nav-item")[1]);
+    }
+
+    // ── TASKS ─────────────────────────────────────────────────────────
+    async function loadTasks() {
+      try {
+        allTasks = await api("GET", "/tasks");
+        renderTasks();
+      } catch (e) { }
+    }
+
+    function renderTasks() {
+      const fp = document.getElementById("filter-priority").value;
+      const fc = document.getElementById("filter-cat").value;
+      const fd = document.getElementById("filter-done").value;
+      let tasks = allTasks;
+      if (fp) tasks = tasks.filter(t => t.priority === fp);
+      if (fc) tasks = tasks.filter(t => String(t.category_id) === fc);
+      if (fd !== "") tasks = tasks.filter(t => String(t.done) === fd);
+      const el = document.getElementById("task-list");
+      el.innerHTML = tasks.length
+        ? tasks.map(t => taskCardHTML(t)).join("")
+        : `<div class="empty"><div class="empty-icon">🎉</div><div class="empty-text">Нет задач</div></div>`;
+    }
+
+    function taskCardHTML(t) {
+      const prioLabel = { high: "🔴 Высокий", medium: "🟡 Средний", low: "🟢 Низкий" }[t.priority] || "";
+      const deadline = t.deadline ? `📅 ${t.deadline}` : "";
+      const cat = t.category_name ? `<span class="tag" style="background:${t.category_color}22; color:${t.category_color}">${h(t.category_name)}</span>` : "";
+      return `
+    <div class="task-card">
+      <div class="task-check ${t.done ? "done" : ""}" onclick="toggleTask(${t.id},${t.done})">
+        ${t.done ? "✓" : ""}
+      </div>
+      <div class="task-body">
+        <div class="task-title ${t.done ? "done" : ""}">${h(t.title)}</div>
+        ${t.description ? `<div class="task-desc">${h(t.description)}</div>` : ""}
+        <div class="task-meta">
+          <span class="tag priority-${t.priority}">${prioLabel}</span>
+          ${cat}
+          ${deadline ? `<span class="tag">${deadline}</span>` : ""}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="btn btn-ghost" style="padding:6px 8px; font-size:12px" onclick="openSendTaskModal(${t.id},'${h(t.title)}','${h(t.description || "")}')">📧</button>
+        <button class="btn btn-warning" style="padding:6px 8px; font-size:12px" onclick="openTaskModal(${t.id})">✏️</button>
+        <button class="btn btn-danger"  style="padding:6px 8px; font-size:12px" onclick="deleteTask(${t.id})">🗑</button>
+      </div>
+    </div>`;
+    }
+
+    function openTaskModal(id) {
+      editTaskId = id || null;
+      document.getElementById("task-modal-title").textContent = id ? "Редактировать задачу" : "Новая задача";
+      if (id) {
+        const t = allTasks.find(x => x.id === id);
+        if (t) {
+          document.getElementById("t-title").value = t.title;
+          document.getElementById("t-desc").value = t.description || "";
+          document.getElementById("t-priority").value = t.priority;
+          document.getElementById("t-cat").value = t.category_id || "";
+          document.getElementById("t-deadline").value = t.deadline || "";
+        }
+      } else {
+        document.getElementById("t-title").value = "";
+        document.getElementById("t-desc").value = "";
+        document.getElementById("t-priority").value = "medium";
+        document.getElementById("t-cat").value = "";
+        document.getElementById("t-deadline").value = "";
+      }
+      openModal("modal-task");
+    }
+
+    async function saveTask() {
+      const title = document.getElementById("t-title").value.trim();
+      if (!title) { toast("Введи название", false); return; }
+      const body = {
+        title,
+        description: document.getElementById("t-desc").value,
+        priority: document.getElementById("t-priority").value,
+        category_id: document.getElementById("t-cat").value || null,
+        deadline: document.getElementById("t-deadline").value || null,
+        done: false
+      };
+      try {
+        if (editTaskId) {
+          const t = allTasks.find(x => x.id === editTaskId);
+          body.done = t ? t.done : false;
+          await api("PUT", `/tasks/${editTaskId}`, body);
+          toast("Задача обновлена");
+        } else {
+          await api("POST", "/tasks", body);
+          toast("Задача создана");
+        }
+        closeModal("modal-task");
+        await loadTasks();
+        loadDashboard();
+      } catch (e) { toast(e.message, false); }
+    }
+
+    async function toggleTask(id, done) {
+      if (!done) {
+        try {
+          await api("POST", `/tasks/${id}/complete`);
+          toast("✅ Выполнено! Уведомление отправлено на почту");
+        } catch (e) { toast("Выполнено"); }
+      } else {
+        const t = allTasks.find(x => x.id === id);
+        if (t) await api("PUT", `/tasks/${id}`, { ...t, done: false });
+        toast("Отмечено как не выполненное");
+      }
+      await loadTasks();
+      loadDashboard();
+    }
+
+    async function deleteTask(id) {
+      if (!confirm("Удалить задачу?")) return;
+      try {
+        await api("DELETE", `/tasks/${id}`);
+        toast("Удалено");
+        await loadTasks();
+        loadDashboard();
+      } catch (e) { toast(e.message, false); }
+    }
+
+    // ── NOTES ─────────────────────────────────────────────────────────
+    async function loadNotes() {
+      try {
+        const notes = await api("GET", "/notes");
+        const grid = document.getElementById("notes-grid");
+        grid.innerHTML = notes.length
+          ? notes.map(n => `
+          <div class="note-card" onclick="openNote(${n.id})">
+            <button class="btn btn-danger note-del" style="padding:4px 8px; font-size:12px" onclick="event.stopPropagation(); deleteNote(${n.id})">🗑</button>
+            <div class="note-title">${h(n.title)}</div>
+            <div class="note-preview">${h(n.content || "Пустая заметка")}</div>
+            <div class="note-date">${new Date(n.updated_at).toLocaleDateString("ru")}</div>
+          </div>`).join("")
+          : `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📝</div><div class="empty-text">Нет заметок</div></div>`;
+      } catch (e) { }
+    }
+
+    function newNote() {
+      editNoteId = null;
+      document.getElementById("note-editor-title").value = "";
+      document.getElementById("note-editor-content").value = "";
+      document.getElementById("notes-list-view").style.display = "none";
+      document.getElementById("note-editor").classList.add("open");
+    }
+
+    async function openNote(id) {
+      try {
+        const notes = await api("GET", "/notes");
+        const n = notes.find(x => x.id === id);
+        if (!n) return;
+        editNoteId = id;
+        document.getElementById("note-editor-title").value = n.title;
+        document.getElementById("note-editor-content").value = n.content || "";
+        document.getElementById("notes-list-view").style.display = "none";
+        document.getElementById("note-editor").classList.add("open");
+      } catch (e) { }
+    }
+
+    async function saveNote() {
+      const title = document.getElementById("note-editor-title").value.trim() || "Без названия";
+      const content = document.getElementById("note-editor-content").value;
+      try {
+        if (editNoteId) {
+          await api("PUT", `/notes/${editNoteId}`, { title, content });
+        } else {
+          await api("POST", "/notes", { title, content });
+        }
+        toast("Сохранено");
+        closeNoteEditor();
+      } catch (e) { toast(e.message, false); }
+    }
+
+    async function deleteNote(id) {
+      if (!confirm("Удалить заметку?")) return;
+      try {
+        await api("DELETE", `/notes/${id}`);
+        toast("Удалено");
+        loadNotes();
+      } catch (e) { }
+    }
+
+    function closeNoteEditor() {
+      document.getElementById("note-editor").classList.remove("open");
+      document.getElementById("notes-list-view").style.display = "block";
+      loadNotes();
+    }
+
+    // ── EMAIL ─────────────────────────────────────────────────────────
+    function switchEmailTab(tab, el) {
+      document.querySelectorAll(".email-tab").forEach(t => t.classList.remove("active"));
+      if (el) el.classList.add("active");
+      document.getElementById("email-tab-send").style.display = tab === "send" ? "block" : "none";
+      document.getElementById("email-tab-inbox").style.display = tab === "inbox" ? "block" : "none";
+    }
+
+    async function sendEmail() {
+      try {
+        await api("POST", "/email/send", {
+          to: document.getElementById("e-to").value,
+          subject: document.getElementById("e-sub").value,
+          body: document.getElementById("e-body").value
+        });
+        toast("Письмо отправлено!");
+        document.getElementById("e-to").value = "";
+        document.getElementById("e-sub").value = "";
+        document.getElementById("e-body").value = "";
+      } catch (e) { toast(e.message, false); }
+    }
+
+    async function loadInbox(protocol) {
+      const el = document.getElementById("inbox-list");
+      el.innerHTML = "<p style='color:var(--text-muted)'>Загрузка…</p>";
+      try {
+        const data = await api("GET", `/email/${protocol}`);
+        el.innerHTML = data.length
+          ? data.map(m => `<div class="mail-item"><div class="mail-subject">${protocol === "imap" ? "📧" : "📬"} ${h(m.subject)}</div><div class="mail-meta">От: ${h(m.from)} · ${h(m.date)}</div></div>`).join("")
+          : "<p style='color:var(--text-muted)'>Нет писем</p>";
+      } catch (e) { el.innerHTML = `<p style='color:var(--red)'>${e.message}</p>`; }
+    }
+
+    function openSendTaskModal(id, title, desc) {
+      sendTaskData = { id, title, desc };
+      document.getElementById("st-to").value = "";
+      openModal("modal-send-task");
+    }
+
+    async function sendTaskEmail() {
+      const to = document.getElementById("st-to").value.trim();
+      if (!to) { toast("Введи email", false); return; }
+      try {
+        await api("POST", "/email/send", {
+          to,
+          subject: `Задача: ${sendTaskData.title}`,
+          body: `Задача: ${sendTaskData.title}\n\nОписание: ${sendTaskData.desc}`
+        });
+        toast("Письмо отправлено!");
+        closeModal("modal-send-task");
+      } catch (e) { toast(e.message, false); }
+    }
+
+
+
+    // ── MODALS ────────────────────────────────────────────────────────
+    function openModal(id) { document.getElementById(id).classList.add("open"); }
+    function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+    document.querySelectorAll(".modal-overlay").forEach(m => m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); }));
+
+    // ── INIT ──────────────────────────────────────────────────────────
+    if (token) {
+      document.getElementById("auth-wrap").style.display = "none";
+      const app = document.getElementById("app");
+      app.style.display = "flex";
+      document.getElementById("sidebar-user").textContent = username;
+      const hr = new Date().getHours();
+      const greet = hr < 12 ? "Доброе утро" : hr < 18 ? "Добрый день" : "Добрый вечер";
+      document.getElementById("greeting").textContent = `${greet}, ${username} 👋`;
+      loadAll();
+      setTimeout(connectWebSocket, 500);
+    } else {
+      document.getElementById("auth-wrap").style.display = "flex";
+    }
+
+    // ── WEBSOCKET ──────────────────────────────────────────────────────
+    const WS_URL = "http://localhost:5001";
+    let socket = null;
+
+    // Индикатор статуса WebSocket в сайдбаре
+    function updateWsStatus(connected) {
+      const el = document.getElementById("ws-status");
+      if (el) {
+        el.textContent = connected ? "🟢 Online" : "🔴 Offline";
+        el.style.color = connected ? "var(--green)" : "var(--red)";
+      }
+    }
+
+    function connectWebSocket() {
+      // Проверяем наличие Socket.IO библиотеки
+      if (typeof io === "undefined") {
+        console.error("Socket.IO library not loaded");
+        setTimeout(connectWebSocket, 2000);
+        return;
+      }
+
+      if (socket) {
+        socket.disconnect();
+      }
+
+      socket = io(WS_URL, {
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: Infinity
+      });
+
+      socket.on("connect", () => {
+        console.log("WebSocket connected:", socket.id);
+        updateWsStatus(true);
+
+        // Отправляем токен для аутентификации
+        socket.emit("authenticate", { token: token });
+      });
+
+      socket.on("authenticated", (data) => {
+        console.log("WebSocket authenticated:", data);
+        toast("🔌 WebSocket подключён", true);
+      });
+
+      socket.on("connected", (data) => {
+        console.log("Connected:", data);
+      });
+
+      socket.on("disconnect", () => {
+        console.log("WebSocket disconnected");
+        updateWsStatus(false);
+      });
+
+      socket.on("error", (data) => {
+        console.error("WebSocket error:", data);
+        toast("❌ Ошибка WebSocket: " + data.message, false);
+      });
+
+      // Когда был создан новый таск (на текущем пользователе)
+      socket.on("task_created", (task) => {
+        console.log("New task via WebSocket:", task);
+        toast(`📋 Новая задача: ${task.title}`, true);
+        // Обновляем список задач
+        setTimeout(() => {
+          loadTasks();
+          loadDashboard();
+        }, 100);
+      });
+
+      // Когда был обновлен таск
+      socket.on("task_updated", (data) => {
+        console.log("Task updated via WebSocket:", data);
+
+        // Обновляем задачу локально в памяти
+        const taskIndex = allTasks.findIndex(t => t.id === data.id);
+        if (taskIndex !== -1) {
+          if (data.done !== undefined) allTasks[taskIndex].done = data.done;
+          if (data.title !== undefined) allTasks[taskIndex].title = data.title;
+          if (data.description !== undefined) allTasks[taskIndex].description = data.description;
+          if (data.priority !== undefined) allTasks[taskIndex].priority = data.priority;
+          if (data.deadline !== undefined) allTasks[taskIndex].deadline = data.deadline;
+          if (data.category_id !== undefined) allTasks[taskIndex].category_id = data.category_id;
+        }
+
+        const status = data.done ? "✅ выполнена" : "✏️ обновлена";
+        toast(`${status}: ${data.title}`, true);
+
+        // Перерисовываем интерфейс
+        renderTasks();
+        loadDashboard();
+      });
+
+      // Когда был удален таск
+      socket.on("task_deleted", (data) => {
+        console.log("Task deleted via WebSocket:", data.id);
+
+        // Удаляем из локальной памяти
+        allTasks = allTasks.filter(t => t.id !== data.id);
+
+        toast(`🗑 Задача удалена`, true);
+
+        // Перерисовываем интерфейс
+        renderTasks();
+        loadDashboard();
+      });
+
+      socket.on("pong", (data) => {
+        console.log("Pong:", data);
+      });
+    }
+
+    // Запускаем WebSocket после логина
+    const _origSetAuth = setAuth;
+    // Переопределяем setAuth чтобы подключать WebSocket после входа
+    window.addEventListener("load", () => {
+      if (token) {
+        setTimeout(connectWebSocket, 500);
+      }
+    });
+
+  </script>
