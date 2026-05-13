@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_USERNAME: artemvldm
   BACKEND_IMAGE: artemvldm/lab6-backend
   FRONTEND_IMAGE: artemvldm/lab6-frontend
 
@@ -28,11 +27,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # ── Build ──────────────────────────────────────────────────────
       - name: Build Docker images
         run: docker compose build
 
-      # ── Start ─────────────────────────────────────────────────────
       - name: Start containers
         run: docker compose up -d
 
@@ -46,11 +43,10 @@ jobs:
               echo "Backend is up"
               break
             fi
-            echo "Attempt $i/30 — sleeping 3s..."
+            echo "Attempt $i/30 - sleeping 3s..."
             sleep 3
           done
 
-      # ── Health checks ─────────────────────────────────────────────
       - name: Check frontend responds (HTTP 200)
         run: |
           curl -sf http://localhost:8080 -o /dev/null
@@ -64,7 +60,7 @@ jobs:
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -1)
           echo "Status: $HTTP_CODE"
-          echo "Body:   $BODY"
+          echo "Body: $BODY"
           if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "409" ]; then
             echo "Register endpoint OK"
           else
@@ -89,29 +85,36 @@ jobs:
         run: |
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/tasks)
           echo "Status: $HTTP_CODE"
-          [ "$HTTP_CODE" = "401" ] && echo "Tasks endpoint OK (correctly returns 401)" || (echo "Unexpected status $HTTP_CODE" && exit 1)
+          if [ "$HTTP_CODE" = "401" ]; then
+            echo "Tasks endpoint OK (correctly returns 401)"
+          else
+            echo "Unexpected status $HTTP_CODE"
+            exit 1
+          fi
 
       - name: Check backend /categories endpoint (auth guard)
         run: |
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/categories)
           echo "Status: $HTTP_CODE"
-          [ "$HTTP_CODE" = "401" ] && echo "Categories endpoint OK (correctly returns 401)" || (echo "Unexpected status $HTTP_CODE" && exit 1)
+          if [ "$HTTP_CODE" = "401" ]; then
+            echo "Categories endpoint OK (correctly returns 401)"
+          else
+            echo "Unexpected status $HTTP_CODE"
+            exit 1
+          fi
 
       - name: Show container logs on failure
         if: failure()
         run: docker compose logs
 
-      # ── Stop & clean ──────────────────────────────────────────────
       - name: Stop and remove containers
         if: always()
         run: docker compose down -v --remove-orphans
 
       - name: Remove built images
         if: always()
-        run: |
-          docker rmi $(docker images -q) --force 2>/dev/null || true
+        run: docker rmi $(docker images -q) --force 2>/dev/null || true
 
-      # ── Push to Docker Hub ────────────────────────────────────────
       - name: Rebuild and push backend image
         uses: docker/build-push-action@v5
         with:
