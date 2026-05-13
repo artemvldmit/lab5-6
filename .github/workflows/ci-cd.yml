@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  BACKEND_IMAGE: artemvldm/lab6-backend
-  FRONTEND_IMAGE: artemvldm/lab6-frontend
-
 jobs:
   build-test-push:
     runs-on: ubuntu-latest
@@ -37,71 +33,49 @@ jobs:
         run: |
           echo "Waiting for backend..."
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:5001/auth/login \
-                 -X POST -H "Content-Type: application/json" \
-                 -d '{"email":"x","password":"x"}' > /dev/null 2>&1; then
-              echo "Backend is up"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/login \
+              -H "Content-Type: application/json" \
+              -d '{"email":"x","password":"x"}')
+            if [ "$STATUS" = "401" ] || [ "$STATUS" = "200" ]; then
+              echo "Backend is up (HTTP $STATUS)"
               break
             fi
-            echo "Attempt $i/30 - sleeping 3s..."
+            echo "Attempt $i/30 - sleeping 3s... (got $STATUS)"
             sleep 3
           done
 
-      - name: Check frontend responds (HTTP 200)
+      - name: Check frontend responds
         run: |
           curl -sf http://localhost:8080 -o /dev/null
           echo "Frontend OK"
 
-      - name: Check backend /auth/register endpoint
+      - name: Check backend register endpoint
         run: |
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST http://localhost:5001/auth/register \
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/register \
             -H "Content-Type: application/json" \
             -d '{"username":"testuser","email":"test@example.com","password":"Test1234!"}')
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | head -1)
-          echo "Status: $HTTP_CODE"
-          echo "Body: $BODY"
-          if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "409" ]; then
-            echo "Register endpoint OK"
-          else
-            echo "Register endpoint FAILED (HTTP $HTTP_CODE)"
-            exit 1
-          fi
+          echo "Register status: $HTTP"
+          test "$HTTP" = "201" || test "$HTTP" = "409"
 
-      - name: Check backend /auth/login endpoint
+      - name: Check backend login endpoint
         run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/login \
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5001/auth/login \
             -H "Content-Type: application/json" \
             -d '{"email":"test@example.com","password":"Test1234!"}')
-          echo "Status: $HTTP_CODE"
-          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "401" ]; then
-            echo "Login endpoint OK"
-          else
-            echo "Login endpoint FAILED (HTTP $HTTP_CODE)"
-            exit 1
-          fi
+          echo "Login status: $HTTP"
+          test "$HTTP" = "200" || test "$HTTP" = "401"
 
-      - name: Check backend /tasks endpoint (auth guard)
+      - name: Check tasks endpoint returns 401 without token
         run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/tasks)
-          echo "Status: $HTTP_CODE"
-          if [ "$HTTP_CODE" = "401" ]; then
-            echo "Tasks endpoint OK (correctly returns 401)"
-          else
-            echo "Unexpected status $HTTP_CODE"
-            exit 1
-          fi
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/tasks)
+          echo "Tasks status: $HTTP"
+          test "$HTTP" = "401"
 
-      - name: Check backend /categories endpoint (auth guard)
+      - name: Check categories endpoint returns 401 without token
         run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/categories)
-          echo "Status: $HTTP_CODE"
-          if [ "$HTTP_CODE" = "401" ]; then
-            echo "Categories endpoint OK (correctly returns 401)"
-          else
-            echo "Unexpected status $HTTP_CODE"
-            exit 1
-          fi
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/categories)
+          echo "Categories status: $HTTP"
+          test "$HTTP" = "401"
 
       - name: Show container logs on failure
         if: failure()
@@ -115,20 +89,16 @@ jobs:
         if: always()
         run: docker rmi $(docker images -q) --force 2>/dev/null || true
 
-      - name: Rebuild and push backend image
+      - name: Push backend image to Docker Hub
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          tags: |
-            ${{ env.BACKEND_IMAGE }}:latest
-            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          tags: artemvldm/lab6-backend:latest,artemvldm/lab6-backend:${{ github.sha }}
 
-      - name: Rebuild and push frontend image
+      - name: Push frontend image to Docker Hub
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          tags: |
-            ${{ env.FRONTEND_IMAGE }}:latest
-            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          tags: artemvldm/lab6-frontend:latest,artemvldm/lab6-frontend:${{ github.sha }}
