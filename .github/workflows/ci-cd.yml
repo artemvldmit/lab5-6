@@ -95,11 +95,11 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: artemvldm/lab6-backend:latest,artemvldm/lab6-backend:${{ github.sha }}
+          tags: iphonepasskey/lab6-backend:latest,iphonepasskey/lab6-backend:${{ github.sha }}
 
       - name: Push frontend image to Docker Hub
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          tags: artemvldm/lab6-frontend:latest,artemvldm/lab6-frontend:${{ github.sha }}
+          tags: iphonepasskey/lab6-frontend:latest,iphonepasskey/lab6-frontend:${{ github.sha }}
