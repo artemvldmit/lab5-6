@@ -36,7 +36,7 @@ jobs:
           for i in $(seq 1 30); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:5001/auth/login \
               -H "Content-Type: application/json" \
-              -d '{"email":"x","password":"x"}')
+              -d '{"email":"x","password":"x"}' || echo "000")
             if [ "$STATUS" = "401" ] || [ "$STATUS" = "200" ]; then
               echo "Backend is up (HTTP $STATUS)"
               break
